@@ -32,7 +32,8 @@ router.post('/:id/comments', (req, res) => {
         :
         Blog.insertComment(comment)
             .then(newId => {
-                !newId ?
+                console.log(newId);
+                !newId.id ?
                     res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
                     :
                     Blog.findCommentById(newId.id)
