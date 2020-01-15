@@ -83,10 +83,10 @@ router.get('/:id/comment', (req, res) => {
     let id = req.params.id;
     Blog.findPostComments(id)
         .then(array => {
-            !array[0] ? 
-            res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
-            :
-            res.status(200).json(array)
+            !array[0] ?
+                res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+                :
+                res.status(200).json(array)
         })
         .catch(err => {
             console.log(err);
@@ -99,18 +99,47 @@ router.get('/:id/comment', (req, res) => {
 router.delete('/:id', (req, res) => {
     let id = req.params.id;
     Blog.remove(id)
-    .then(num => {
-        num < 1 ? 
-        res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
-        :
-        res.status(200).json({ message: "Post successfully deleted."})
-    })
-    .catch(err => {
-        console.log(err);
-        res.status(500).json({ errorMessage: "The post could not be removed" })
-    });
+        .then(num => {
+            num < 1 ?
+                res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+                :
+                res.status(200).json({ message: "Post successfully deleted." })
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ errorMessage: "The post could not be removed" })
+        });
 });
 
+
+// PUT (edit) post by id
+router.put('/:id', (req, res) => {
+    let id = req.params.id;
+    let changes = req.body;
+    let title = req.body.title;
+    let contents = req.body.contents;
+
+    !title || !contents ?
+        res.status(400).json({ errorMessage: "Please provide title and contents for the post." })
+        :
+        Blog.update(id, changes)
+            .then(num => {
+                num < 1 ?
+                    res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+                    :
+                    Blog.findById(id)
+                        .then(post => {
+                            res.status(200).json(post[0])
+                        })
+                        .catch(err => {
+                            console.log(err);
+                        });
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).json({ errorMessage: "The post information could not be modified." })
+            });
+});
 
 
 module.exports = router;
