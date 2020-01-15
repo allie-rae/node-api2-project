@@ -25,17 +25,12 @@ router.post('/:id/comments', (req, res) => {
     req.body.post_id = req.params.id;
     let text = req.body.text;
     let comment = req.body;
-    console.log(comment)
 
     !text ?
         res.status(400).json({ errorMessage: "Please provide text for the comment." })
         :
         Blog.insertComment(comment)
             .then(newId => {
-                console.log(newId);
-                !newId.id ?
-                    res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
-                    :
                     Blog.findCommentById(newId.id)
                         .then(comment => {
                             res.status(201).json(comment[0]);
@@ -46,6 +41,9 @@ router.post('/:id/comments', (req, res) => {
             })
             .catch(err => {
                 console.log(err);
+                err.errno === 19 ? 
+                res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+                :
                 res.status(500).json({ errorMessage: "There was an error while saving the comment to the database." });
             });
 });
