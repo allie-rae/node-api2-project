@@ -6,7 +6,6 @@ router.post('/', (req, res) => {
     post = req.body;
     title = req.body.title;
     contents = req.body.contents;
-    console.log(post)
 
     !title || !contents ?
         res.status(400).json({ errorMessage: "Please provide a title and contents for the post." })
@@ -26,13 +25,12 @@ router.post('/:id/comments', (req, res) => {
     req.body.post_id = req.params.id;
     let text = req.body.text;
     let comment = req.body;
-    console.log(comment)
+
     !text ?
         res.status(400).json({ errorMessage: "Please provide text for the comment." })
         :
         Blog.insertComment(comment)
             .then(id => {
-                console.log(id)
                 !id ?
                     res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
                     :
@@ -66,13 +64,13 @@ router.get('/', (req, res) => {
 
 // GET post by id
 router.get('/:id', (req, res) => {
-    let id = req.params.id
+    let id = req.params.id;
     Blog.findById(id)
         .then(array => {
-            !array[0] ? 
-            res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
-            :
-            res.status(200).json(array[0]);
+            !array[0] ?
+                res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+                :
+                res.status(200).json(array[0]);
         })
         .catch(err => {
             console.log(err);
@@ -80,4 +78,19 @@ router.get('/:id', (req, res) => {
         });
 });
 
+// GET comments by post id 
+router.get('/:id/comment', (req, res) => {
+    let id = req.params.id;
+    Blog.findPostComments(id)
+        .then(array => {
+            !array[0] ? 
+            res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+            :
+            res.status(200).json(array)
+        })
+        .catch(err => {
+            console.log(err);
+            res.status(500).json({ errorMessage: "The comments information could not be retrieved." })
+        })
+})
 module.exports = router;
