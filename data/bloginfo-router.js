@@ -91,6 +91,26 @@ router.get('/:id/comment', (req, res) => {
         .catch(err => {
             console.log(err);
             res.status(500).json({ errorMessage: "The comments information could not be retrieved." })
-        })
-})
+        });
+});
+
+
+// DELETE post by id
+router.delete('/:id', (req, res) => {
+    let id = req.params.id;
+    Blog.remove(id)
+    .then(num => {
+        num < 1 ? 
+        res.status(404).json({ errorMessage: "The post with the specified ID does not exist." })
+        :
+        res.status(200).json({ message: "Post successfully deleted."})
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({ errorMessage: "The post could not be removed" })
+    });
+});
+
+
+
 module.exports = router;
